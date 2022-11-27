@@ -6,12 +6,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import EditTodoForm from './EditTodoForm';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled, CardProps } from "@mui/material";
+import { useFetchDoneTodosQuery, useDeleteDoneTodoMutation } from '../../Slices/todo-done-slice/todoDoneSlice';
+import { useAddActiveTodoMutation } from '../../Slices/todo-active-slice/todoActiveSlice';
 
-type todoStructureProps = { name: string, id: string };
+type todoStructureProps = { title: string, _id: string };
 interface DoneListProps {
     currentTodo: todoStructureProps,
-    returnDoneList: Function,
-    deleteDoneList: Function
     doneListEdit: Function
 }
 
@@ -24,9 +24,11 @@ const CardDoneList = styled(Card)<CardProps>({
 })
 
 const DoneListCard = (props: DoneListProps): JSX.Element => {
-    const {returnDoneList, currentTodo, deleteDoneList, doneListEdit} = props
+    const [deleteDoneTodo] = useDeleteDoneTodoMutation()
+    const [addActiveList] = useAddActiveTodoMutation()
+    const {currentTodo, doneListEdit} = props
     const [doneListEditMode, setDoneListEditMode] = useState(false)
-    const [toggleMenu, setToggleMenu] = useState(window.innerWidth <= 600 ? false : true);
+    const [toggleMenu] = useState(window.innerWidth <= 600 ? false : true);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openMenu = Boolean(anchorEl);
 
@@ -34,21 +36,34 @@ const DoneListCard = (props: DoneListProps): JSX.Element => {
     const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
     const menuHandleClose = () => {setAnchorEl(null)}
 
+    const deleteDoneListHandler = (currentTodo: todoStructureProps) => {
+      deleteDoneTodo(currentTodo._id)
+    }
+
+    const setDoneList = (currentTodo: todoStructureProps) => {
+      addActiveList({title: currentTodo.title})
+    }
+
+    const returnDoneListHandler = (currentTodo: todoStructureProps) => {
+      deleteDoneListHandler(currentTodo)
+      setDoneList(currentTodo)
+    }
+
   return (
     <CardDoneList>
         {!doneListEditMode ? (
           <>
-          <Typography fontWeight="bold" sx={{ flexFlow: 1}}>{currentTodo.name}</Typography>
+          <Typography fontWeight="bold" sx={{ flexFlow: 1}}>{currentTodo.title}</Typography>
           {toggleMenu ? (
             <Box>
-            <Tooltip title={`Delete ${currentTodo.name} From Done List`}>
-              <DeleteIcon color="error" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => deleteDoneList(currentTodo)}/>
+            <Tooltip title={`Delete ${currentTodo.title} From Done List`}>
+              <DeleteIcon color="error" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => deleteDoneListHandler(currentTodo)}/>
             </Tooltip>
-            <Tooltip title={`Edit ${currentTodo.name} `}>
+            <Tooltip title={`Edit ${currentTodo.title} `}>
               <EditIcon color="primary" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => setDoneListEditMode(true)} />
             </Tooltip>
-            <Tooltip title={`Add ${currentTodo.name} To Active List`}>
-              <KeyboardReturnIcon color="success" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => returnDoneList(currentTodo)} />
+            <Tooltip title={`Add ${currentTodo.title} To Active List`}>
+              <KeyboardReturnIcon color="success" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => returnDoneListHandler(currentTodo)} />
             </Tooltip>
             </Box>
           ): (
@@ -70,8 +85,8 @@ const DoneListCard = (props: DoneListProps): JSX.Element => {
                       }}
               >
               <MenuItem onClick={() => setDoneListEditMode(true)}>Edit</MenuItem>
-              <MenuItem onClick={() => deleteDoneList(currentTodo)}>Delete</MenuItem>
-              <MenuItem onClick={() => returnDoneList(currentTodo)}>AddToDone</MenuItem>
+              <MenuItem onClick={() => deleteDoneListHandler(currentTodo)}>Delete</MenuItem>
+              <MenuItem onClick={() => returnDoneListHandler(currentTodo)}>AddToDone</MenuItem>
             </Menu>
           </Box>
           )}
@@ -79,7 +94,7 @@ const DoneListCard = (props: DoneListProps): JSX.Element => {
         ) : (
           <EditTodoForm
             menuHandle={menuHandleClose}
-            currentName={currentTodo.name}
+            currentName={currentTodo.title}
             formSubmit={doneListEditHandler} />
         )}
     </CardDoneList>

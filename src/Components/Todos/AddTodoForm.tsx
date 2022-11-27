@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react'
 import { Button, Grid, TextField } from '@mui/material'
+import { useAddActiveTodoMutation, useFetchActiveTodosQuery } from '../../Slices/todo-active-slice/todoActiveSlice'
 interface addTodoFormProps {
-    formSubmit: Function
     currentName?: string
 }
 
 const AddTodoForm = (props: addTodoFormProps) => {
+  const [addActiveTodo] = useAddActiveTodoMutation()
   const [ addTodo, setAddTodo ] = useState(props.currentName ? props.currentName : '');
   const [formValidate, setFormValidate] = useState(false)
 
   useEffect(() => {
     checkFormValidate()
   }, [addTodo])
-  const formSubmitHandler = () => {
-    props.formSubmit(addTodo);
+
+  const setAddTodoHandler = (currentTodo: string): void => {
+    const createActiveTodo: {title:string} = {
+      title: currentTodo
+    }
+    addActiveTodo(createActiveTodo)
     setAddTodo('')
   }
 
@@ -21,6 +26,7 @@ const AddTodoForm = (props: addTodoFormProps) => {
     if (addTodo.trim().length !== 0) setFormValidate(true)
     else setFormValidate(false)
   }
+  
 
   return (
     <Grid container gap={1}>
@@ -34,7 +40,7 @@ const AddTodoForm = (props: addTodoFormProps) => {
               fullWidth 
               sx={{ height: '100%' }}
               disabled={formValidate ? false : true}
-              onClick={formSubmitHandler}>SUBMIT</Button>
+              onClick={() => setAddTodoHandler(addTodo)}>SUBMIT</Button>
         </Grid>
     </Grid>
   )

@@ -6,12 +6,12 @@ import React, { useState } from "react";
 import EditTodoForm from "./EditTodoForm";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled, CardProps } from "@mui/material";
+import { useDeleteActiveTodoMutation, useFetchActiveTodosQuery } from "../../Slices/todo-active-slice/todoActiveSlice";
+import { useAddDoneTodoMutation, useFetchDoneTodosQuery } from "../../Slices/todo-done-slice/todoDoneSlice";
 
-type todoStructureProps = { name: string, id: string };
+type todoStructureProps = { title: string, _id: string };
 interface activeListProps {
   currentTodo: todoStructureProps,
-  deleteActiveListTodo: Function,
-  AddActiveListTodo: Function,
   activeListEdit: Function
 }
 
@@ -24,7 +24,12 @@ const CardActiveList = styled(Card)<CardProps>({
 })
 
 const ActiveListCard = (props: activeListProps): JSX.Element => {
-  const {deleteActiveListTodo, currentTodo, AddActiveListTodo, activeListEdit} = props
+  const activeList = useFetchActiveTodosQuery() // { data, isFetching }
+  const doneList = useFetchDoneTodosQuery() // { data, isFetching }
+  const [deleteActiveTodo, responseActiveTodo] = useDeleteActiveTodoMutation()
+  const [addDoneTodo, responseDoneTodo] = useAddDoneTodoMutation()
+
+  const { currentTodo, activeListEdit} = props
   const [toggleMenu, setToggleMenu] = useState(window.innerWidth <= 600 ? false : true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [activeListEditMode, setActiveListEditMode] = useState(false)
@@ -34,21 +39,36 @@ const ActiveListCard = (props: activeListProps): JSX.Element => {
   const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
   const menuHandleClose = () => {setAnchorEl(null)}
 
+  const deleteActiveListTodoHandler = (currentTodo: todoStructureProps) => {
+    deleteActiveTodo(currentTodo._id)
+  }
+
+  const setDoneList = (currentTodo: todoStructureProps) => {
+    addDoneTodo({title: currentTodo.title})
+  }
+  
+  const setTodoInDoneList = (currentTodo: todoStructureProps) => {
+    setDoneList(currentTodo)
+    deleteActiveListTodoHandler(currentTodo)
+  }
+
+
+
   return (
     <CardActiveList>
       {!activeListEditMode ? (
         <>
-        <Typography fontWeight="bold" sx={{ flexFlow: 1}}>{currentTodo.name}</Typography>
+        <Typography fontWeight="bold" sx={{ flexFlow: 1}}>{currentTodo.title}</Typography>
         {toggleMenu ? (
         <Box>
-        <Tooltip title={`Delete ${currentTodo.name} From Active List`}>
-          <DeleteIcon color="error" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => deleteActiveListTodo(currentTodo)} />
+        <Tooltip title={`Delete ${currentTodo.title} From Active List`}>
+          <DeleteIcon color="error" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => deleteActiveListTodoHandler(currentTodo)} />
         </Tooltip>
-        <Tooltip title={`Edit ${currentTodo.name} `}>
+        <Tooltip title={`Edit ${currentTodo.title} `}>
           <EditIcon color="primary" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => setActiveListEditMode(true)} />
         </Tooltip>
-        <Tooltip title={`Add ${currentTodo.name} To Done List`}>
-          <CheckBoxIcon color="success" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => AddActiveListTodo(currentTodo)} />
+        <Tooltip title={`Add ${currentTodo.title} To Done List`}>
+          <CheckBoxIcon color="success" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => setTodoInDoneList(currentTodo)} />
         </Tooltip>
         </Box>
         ): (
@@ -70,8 +90,8 @@ const ActiveListCard = (props: activeListProps): JSX.Element => {
                     }}
             >
             <MenuItem onClick={() => setActiveListEditMode(true)}>Edit</MenuItem>
-            <MenuItem onClick={() => deleteActiveListTodo(currentTodo)}>Delete</MenuItem>
-            <MenuItem onClick={() => AddActiveListTodo(currentTodo)}>AddToDone</MenuItem>
+            <MenuItem onClick={() => deleteActiveListTodoHandler(currentTodo)}>Delete</MenuItem>
+            <MenuItem onClick={() => {setTodoInDoneList(currentTodo)}}>AddToDone</MenuItem>
           </Menu>
         </Box>
         )}
@@ -79,7 +99,7 @@ const ActiveListCard = (props: activeListProps): JSX.Element => {
       ) : (
         <EditTodoForm 
          menuHandle={menuHandleClose}
-         currentName={currentTodo.name}
+         currentName={currentTodo.title}
          formSubmit={activeListEditHandler} />
       )}
     </CardActiveList>
