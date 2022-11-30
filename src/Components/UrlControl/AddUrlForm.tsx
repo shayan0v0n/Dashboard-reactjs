@@ -1,14 +1,13 @@
 import { Box, Button, Grid, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { useAddUrlListMutation } from '../../Slices/urls-slice/urlsSplice'
+type urlStructure = { name:string, address:string }
 
-interface AddUrlFormProps {
-    formUrl: Function
-}
+const AddUrlForm = () => {
+    const [addUrlList] = useAddUrlListMutation()
 
-const AddUrlForm = (props: AddUrlFormProps) => {
     const currentStorage: any = localStorage.getItem("dashboard")
     const currentStorageJSON = JSON.parse(currentStorage);
-    const {formUrl} = props
     const [ urlName, setUrlName ] = useState('');
     const [ urlAddress, setUrlAddress ] = useState('');
     const [formValidate, setFormValidate] = useState(false)
@@ -21,15 +20,24 @@ const AddUrlForm = (props: AddUrlFormProps) => {
         else setFormValidate(false)
     }
 
+    const addUrlHandler = (urlName: string, urlAddress: string): void => {
+      const createUrl:urlStructure = {
+        name: urlName,
+        address: urlAddress
+      }
+      addUrlList(createUrl)
+    }
+    
     const formControlhandler = () => {
         const findedIndexAddress = currentStorageJSON.urls.findIndex((item: any) =>item.address == urlAddress)
         const findedIndexName = currentStorageJSON.urls.findIndex((item: any) =>item.name == urlName)
         if (findedIndexAddress !== -1 && findedIndexName !== -1) return
         
-        formUrl(urlName, urlAddress)
+        addUrlHandler(urlName, urlAddress)
         setUrlName('')
         setUrlAddress('')
     }
+
 
   return (
     <Grid container gap={1} justifyContent="space-around">

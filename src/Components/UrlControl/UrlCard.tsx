@@ -4,9 +4,11 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CopyAllIcon from '@mui/icons-material/CopyAll';
 import EditUrlForm from './EditUrlForm';
 import { styled, CardProps } from "@mui/material";
+import { useDeleteUrlListMutation, useUpdateUrlListMutation } from '../../Slices/urls-slice/urlsSplice';
 
-interface urlCardProps { currentUrl: urlData, deleteUrl: Function, editUrl: Function}
-interface urlData { name: string, address: string,id: string }
+interface urlCardProps { currentUrl: urlData}
+
+interface urlData { name: string, address: string, _id: string }
 
 const CardUrlList = styled(Card)<CardProps>({
     margin: '1rem',
@@ -17,28 +19,42 @@ const CardUrlList = styled(Card)<CardProps>({
 })
 
 
+
 const UrlCard = (props: urlCardProps) => {
-    const {currentUrl, deleteUrl, editUrl} = props
+    const [deleteUrlList] = useDeleteUrlListMutation()
+    const [updateUrlList] = useUpdateUrlListMutation()
+    const {currentUrl} = props
     const currentName = currentUrl.name
     const currentAddress = currentUrl.address
-    const [toggleMenu, setToggleMenu] = useState(window.innerWidth <= 600 ? false : true);
+    const [toggleMenu] = useState(window.innerWidth <= 600 ? false : true);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [editMode, setEditMode] = useState(false)
     const [open, setOpen] = React.useState(false);
     const textToCopy = currentAddress;
     const openMenu = Boolean(anchorEl);
+    const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
+    const menuHandleClose = () => {setAnchorEl(null)}
+    const copyToClipboardHandler = () => {navigator.clipboard.writeText(textToCopy); setOpen(true)}
 
+    const deleteUrlHandler = (currentUrl: urlData) => {
+        deleteUrlList(currentUrl._id)
+    }
+    
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') return
         setOpen(false);
     };
 
-    const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
-    const menuHandleClose = () => {setAnchorEl(null)}
-    const copyToClipboardHandler = () => {navigator.clipboard.writeText(textToCopy); setOpen(true)}
+    const editUrlHandler = (currentUrl: urlData, currentName: string, currentAddress: string) => {
+            const createUrl:any = {
+            name: currentName,
+            address: currentAddress
+          }
+          updateUrlList({body:createUrl, id:currentUrl._id})
+    }
 
     const editHandler = (updatedName: string, updatedAddress: string) => {
-        editUrl(currentUrl, updatedName, updatedAddress);
+        editUrlHandler(currentUrl, updatedName, updatedAddress);
         setEditMode(false)
     }
 
@@ -67,7 +83,7 @@ const UrlCard = (props: urlCardProps) => {
           >
           <MenuItem onClick={() => {menuHandleClose(); copyToClipboardHandler()}}>Copy</MenuItem>
           <MenuItem onClick={() => {menuHandleClose(); setEditMode(true)}}>Edit</MenuItem>
-          <MenuItem onClick={() => {menuHandleClose(); deleteUrl(currentUrl)}}>Delete</MenuItem>
+          <MenuItem onClick={() => {menuHandleClose(); deleteUrlHandler(currentUrl)}}>Delete</MenuItem>
         </Menu>
         { toggleMenu ? (
             <Chip label="Copy" sx={{ cursor: 'pointer' }} icon={<CopyAllIcon />} onClick={() => copyToClipboardHandler()}/>
