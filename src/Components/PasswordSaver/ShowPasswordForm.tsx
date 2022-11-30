@@ -3,7 +3,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useEffect, useState } from 'react'
 import uuid from 'react-uuid'
-interface currentPassowrdsStructure {id: string, title: string, password: string}
+interface currentPassowrdsStructure {_id: string, title: string, password: string}
 interface ShowPasswordFormProps {
    passwordHandler: Function,
    currentPassword: currentPassowrdsStructure

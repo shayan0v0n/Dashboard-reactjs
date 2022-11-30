@@ -3,7 +3,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useEffect, useState } from 'react'
 import uuid from 'react-uuid'
-interface currentPassowrdsStructure {id: string, title: string, password: string}
+interface currentPassowrdsStructure {_id: string, title: string, password: string}
 interface EditPasswordFormProps {
    passwordHandler: Function,
    currentPassword: currentPassowrdsStructure
@@ -26,8 +26,8 @@ const EditPasswordForm = (props: EditPasswordFormProps) => {
     }
 
     const editPassowrdFormHandler = () => {
-      const addPasswordStructure: currentPassowrdsStructure = {id: uuid(), title: title, password: password}
-      passwordHandler(currentPassword, addPasswordStructure)
+      const addPasswordStructure: currentPassowrdsStructure = {_id: currentPassword._id, title: title, password: password}
+      passwordHandler(addPasswordStructure)
 
       setTitle('')
       setPassword('')

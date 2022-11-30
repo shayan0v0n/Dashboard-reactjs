@@ -10,12 +10,12 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { styled, CardProps } from "@mui/material";
 import EditPasswordForm from "./EditPasswordForm";
 import ShowPasswordForm from "./ShowPasswordForm";
+import { useDeletePasswordMutation, useUpdatePasswordMutation } from "../../Slices/password-saver-slice/passwordSaverSlice";
+import { useUpdateActiveTodoMutation } from "../../Slices/todo-active-slice/todoActiveSlice";
 
-interface currentPassowrdsStructure {id: string, title: string, password: string} 
+interface currentPassowrdsStructure {_id: string, title: string, password: string} 
 interface passwordCardProps {
-    currentPassword: currentPassowrdsStructure,
-    deletePassword: Function
-    editPassword: Function
+    currentPassword: currentPassowrdsStructure
     login: boolean
 }
 
@@ -28,8 +28,10 @@ const CardPasswordSaver = styled(Card)<CardProps>({
 })
 
 const PasswordCard = (props: passwordCardProps) => {
-    const {currentPassword, deletePassword, editPassword, login} = props
-    const [toggleMenu, setToggleMenu] = useState(window.innerWidth <= 600 ? false : true);
+    const [deletePassword] = useDeletePasswordMutation()
+    const [updatePassword] = useUpdatePasswordMutation()
+    const {currentPassword, login} = props
+    const [toggleMenu] = useState(window.innerWidth <= 600 ? false : true);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openMenu = Boolean(anchorEl);
     const [editMode, setEditMode] = useState(false)
@@ -38,8 +40,19 @@ const PasswordCard = (props: passwordCardProps) => {
     const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
     const menuHandleClose = () => {setAnchorEl(null)}
 
-    const editPasswordHandler = (currentPass: currentPassowrdsStructure, newPass: {title: string, password: string}) => {
-      editPassword(currentPass, newPass)
+    const editPasswordHandler = (newPass: currentPassowrdsStructure) => {
+      const newPassBody: {title:string, password:string} = {
+        title: newPass.title,
+        password: newPass.password
+      }      
+      const query:{id:string, body:{title:string, password:string}} = {id:newPass._id, body:newPassBody}
+      
+      updatePassword(query)
+      setEditMode(false)
+    }
+    
+    const deletePasswordHandler = () => {
+      deletePassword(currentPassword._id)
       setEditMode(false)
     }
 
@@ -72,7 +85,7 @@ const PasswordCard = (props: passwordCardProps) => {
                      onClick={() => {menuHandleClose(); setShowMode(true)}}>Show</MenuItem>
                     <MenuItem 
                      disabled={login ? true : false} 
-                     onClick={() => {menuHandleClose(); deletePassword(currentPassword)}}>Delete</MenuItem>
+                     onClick={() => {menuHandleClose(); deletePasswordHandler()}}>Delete</MenuItem>
                   </Menu>
                     {toggleMenu ? (
                       <Chip

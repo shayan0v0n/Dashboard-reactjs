@@ -3,14 +3,15 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useEffect, useState } from 'react'
 import uuid from 'react-uuid'
-interface currentPassowrdsStructure {id: string, title: string, password: string}
+import { useAddPasswordMutation } from '../../Slices/password-saver-slice/passwordSaverSlice';
+interface currentPassowrdsStructure {title: string, password: string}
 interface AddPasswordFormProps {
-   passwordHandler: Function,
    login: boolean
   }
 
 const AddPasswordForm = (props: AddPasswordFormProps) => {
-  const { passwordHandler, login } = props
+  const [addPassword] = useAddPasswordMutation()
+  const { login } = props
     const [title, setTitle] = useState('')
     const [password, setPassword] = useState('')
     const [passwordStatus, setPasswordStatus] = useState(true)
@@ -26,8 +27,8 @@ const AddPasswordForm = (props: AddPasswordFormProps) => {
     }
 
     const addPassowrdFormHandler = () => {
-      const addPasswordStructure: currentPassowrdsStructure = {id: uuid(), title: title, password: password}
-      passwordHandler(addPasswordStructure)
+      const addPasswordStructure: currentPassowrdsStructure = {title: title, password: password}
+      addPassword(addPasswordStructure)
       setTitle('')
       setPassword('')
     }
