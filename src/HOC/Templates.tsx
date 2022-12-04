@@ -9,6 +9,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
+import LinearProgress from '@mui/material/LinearProgress';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ListItem from '@mui/material/ListItem';
@@ -26,6 +27,7 @@ import RegisterPassword from '../Components/PasswordAuth/RegisterPassword';
 import { FormControlLabel, Switch } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
 import useDarkMode from '../store/useDarkMode';
+import useLoading from '../store/useLoading';
 
 const dashboardDefault: {
   passwordAuth: any
@@ -190,6 +192,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const Templates = (props: TemplateProps): JSX.Element => {
   const darkMode = useDarkMode()
+  const loading = useLoading()
   const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
   const currentLocalStorageJSON = JSON.parse(currentLocalStorage) ? JSON.parse(currentLocalStorage) : null
   const registerModal = !currentLocalStorageJSON?.passwordAuth.email ? true : false
@@ -244,6 +247,9 @@ const Templates = (props: TemplateProps): JSX.Element => {
             />
           </Typography>
         </Toolbar>
+        <Box sx={{ display: loading.loadingStatus ? 'block' : 'none' }}>
+          <LinearProgress color="inherit" />
+        </Box>
       </AppBar>
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>

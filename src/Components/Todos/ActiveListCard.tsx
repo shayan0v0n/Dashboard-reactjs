@@ -15,26 +15,28 @@ interface activeListProps {
   activeListEdit: Function
 }
 
-const CardActiveList = styled(Card)<CardProps>({
-  margin: '1rem',
-  padding: '.8rem',
-  display: "flex",
-  justifyContent: 'space-between',
-  border: '0.2px solid #1565c0'
-})
 
 const ActiveListCard = (props: activeListProps): JSX.Element => {
   const activeList = useFetchActiveTodosQuery() // { data, isFetching }
   const doneList = useFetchDoneTodosQuery() // { data, isFetching }
   const [deleteActiveTodo, responseActiveTodo] = useDeleteActiveTodoMutation()
   const [addDoneTodo, responseDoneTodo] = useAddDoneTodoMutation()
-
+  
+  const [currentStatusCard, setCurrentStatusCard] = useState('none');
   const { currentTodo, activeListEdit} = props
   const [toggleMenu, setToggleMenu] = useState(window.innerWidth <= 600 ? false : true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [activeListEditMode, setActiveListEditMode] = useState(false)
   const openMenu = Boolean(anchorEl);
-
+  const CardActiveList = styled(Card)<CardProps>({
+    margin: '1rem',
+    padding: '.8rem',
+    display: "flex",
+    justifyContent: 'space-between',
+    border: `0.2px solid ${currentStatusCard}`,
+    boxShadow: `0px 0px 10px ${currentStatusCard}`
+  })
+  
   const activeListEditHandler = (newTodo: string) => {activeListEdit(currentTodo, newTodo);setActiveListEditMode(false)}
   const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
   const menuHandleClose = () => {setAnchorEl(null)}
@@ -55,20 +57,37 @@ const ActiveListCard = (props: activeListProps): JSX.Element => {
 
 
   return (
-    <CardActiveList>
+    <CardActiveList 
+      onMouseEnter={() => setCurrentStatusCard('#cfcccc')}
+      onMouseLeave={() => setCurrentStatusCard('none')}>
       {!activeListEditMode ? (
         <>
         <Typography fontWeight="bold" sx={{ flexFlow: 1}}>{currentTodo.title}</Typography>
         {toggleMenu ? (
         <Box>
         <Tooltip title={`Delete ${currentTodo.title} From Active List`}>
-          <DeleteIcon color="error" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => deleteActiveListTodoHandler(currentTodo)} />
+          <DeleteIcon
+            onMouseEnter={() => setCurrentStatusCard('#c62828')}
+            onMouseLeave={() => setCurrentStatusCard('none')}
+            sx={{ margin: '0 .3rem', cursor: 'pointer' }} 
+            color="error" 
+            onClick={() => deleteActiveListTodoHandler(currentTodo)} />
         </Tooltip>
         <Tooltip title={`Edit ${currentTodo.title} `}>
-          <EditIcon color="primary" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => setActiveListEditMode(true)} />
+          <EditIcon
+          onMouseEnter={() => setCurrentStatusCard('#1565c0')}
+          onMouseLeave={() => setCurrentStatusCard('none')}
+          sx={{ margin: '0 .3rem', cursor: 'pointer' }} 
+          color="primary" 
+          onClick={() => setActiveListEditMode(true)} />
         </Tooltip>
         <Tooltip title={`Add ${currentTodo.title} To Done List`}>
-          <CheckBoxIcon color="success" sx={{ margin: '0 .3rem', cursor: 'pointer' }} onClick={() => setTodoInDoneList(currentTodo)} />
+          <CheckBoxIcon
+          onMouseEnter={() => setCurrentStatusCard('#7dcfb6')}
+          onMouseLeave={() => setCurrentStatusCard('none')}
+          color="success"
+          sx={{ margin: '0 .3rem', cursor: 'pointer' }}
+          onClick={() => setTodoInDoneList(currentTodo)} />
         </Tooltip>
         </Box>
         ): (
