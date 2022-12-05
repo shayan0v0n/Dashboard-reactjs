@@ -3,6 +3,7 @@ import Button from '@mui/material/Button'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import uuid from 'react-uuid'
+import { motion } from "framer-motion";
 import IncomeCard from '../Components/Wallet/IncomeCard'
 import IncomeForm from '../Components/Wallet/IncomeForm'
 import SpendCard from '../Components/Wallet/SpendCard'
@@ -124,29 +125,67 @@ const Wallet = () => {
     setIncomeList(currentStorage)
   }
 
+  const container = {
+    hidden: { opacity: 1, scale: 0 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.2
+      }
+    }
+  };
+  
+  const item = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1
+    }
+  };
+
   return (
     <>
      <Button onClick={() => {navigate('/walletControl/walletStatus')}} fullWidth variant='contained' sx={{ padding: '2rem 1rem', margin: '1rem 0' }} disabled={walletStatusValidate ? false : true}>WALLET STATUS</Button>
       <Grid container gap={2} margin="1rem" justifyContent="center">
         <Grid item xs={12} md={5} margin="1rem" textAlign='center'>
           <Typography variant='h5' fontWeight="bold">Income Items💵</Typography>
+          <motion.div
+          className="container"
+          variants={container}
+          initial="hidden"
+          animate="visible"
+          >
             { incomeList.map((income: incomeAndSpendStructure, index: number) => (
+              <motion.div key={index} className="item" variants={item}>
               <IncomeCard key={index}
                incomeData={income}
                deleteIncomeCard={deleteIncomeCardHandler}
                updateIncomeCard={updateIncomeCardHandler} />
+               </motion.div>
             )) }
+          </motion.div>
             <IncomeForm setIncomeList={setIncomeListHandler} />
         </Grid>
         <Grid item xs={12} md={5} margin="1rem" textAlign='center'>
           <Typography variant='h5' fontWeight="bold">Spend Items💰</Typography>
-          { spendList.map((spend: incomeAndSpendStructure, index: number) => (
-              <SpendCard
-              key={index}
-               spendData={spend}
-               deleteSpendCard={deleteSpendCardHandler}
-               updateSpendCard={updateSpendCardHandler} />
-          )) }
+          <motion.div
+          className="container"
+          variants={container}
+          initial="hidden"
+          animate="visible"
+          >
+            { spendList.map((spend: incomeAndSpendStructure, index: number) => (
+              <motion.div key={index} className="item" variants={item}>
+                <SpendCard
+                key={index}
+                spendData={spend}
+                deleteSpendCard={deleteSpendCardHandler}
+                updateSpendCard={updateSpendCardHandler} />
+              </motion.div>
+            )) }
+          </motion.div>
           <SpendForm setSpendList={setSpendListHandler} />
         </Grid>
       </Grid>
