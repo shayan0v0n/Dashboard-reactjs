@@ -5,6 +5,11 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuItem from '@mui/material/MenuItem';
 import React, { useState } from 'react';
 import EditSpendCard from './EditSpendCard';
+import { useDeleteWalletSpendMutation, useUpdateWalletSpendMutation } from '../../Slices/wallet-spend-slice/walletSpendSlice';
+type incomeAndSpendStructure = { title:string, value:number, _id:string }
+interface spendCardProps {
+  spendData: incomeAndSpendStructure
+}
 
 const SpendCardContainer = styled(Card)<CardProps>({ 
   margin: '1rem',
@@ -16,15 +21,11 @@ const SpendCardContainer = styled(Card)<CardProps>({
   background: '#ee6b6e'
 })
 
-interface incomeAndSpendStructure { title: String, value: Number, id: String, createdData: Number }
-interface spendCardProps {
-  spendData: incomeAndSpendStructure
-  deleteSpendCard: Function
-  updateSpendCard: Function
-}
 
 const SpendCard = (props: spendCardProps) => {
-  const { spendData, deleteSpendCard, updateSpendCard } = props
+  const { spendData } = props
+  const [deleteWalletMutation]  = useDeleteWalletSpendMutation()
+  const [updateWalletMutation]  = useUpdateWalletSpendMutation()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
   const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
@@ -32,14 +33,14 @@ const SpendCard = (props: spendCardProps) => {
   const [editMode, setEditMode] = useState(false)
 
   const deleteButtonHandler = () => {
-    deleteSpendCard(spendData.id)
+    deleteWalletMutation(spendData._id)
     menuHandleClose()
   }
 
   const editButtonHandler = () => setEditMode(true)
 
   const updateButtonHandler = (updatedData: incomeAndSpendStructure) => {
-    updateSpendCard(updatedData)
+    updateWalletMutation({id:updatedData._id , body: updatedData})
     menuHandleClose()
     setEditMode(false)
   }

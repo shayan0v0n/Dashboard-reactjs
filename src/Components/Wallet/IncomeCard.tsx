@@ -1,15 +1,14 @@
 import { Card, Typography, Box, Tooltip, Button } from '@mui/material'
 import { styled, CardProps } from "@mui/material";
 import Menu from '@mui/material/Menu'
+import { useDeleteWalletIncomeMutation, useUpdateWalletIncomeMutation } from '../../Slices/wallet-income-slice/walletIncomeSlice';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuItem from '@mui/material/MenuItem';
 import React, { useState } from 'react';
 import EditIncomeCard from './EditIncomeCard';
-interface spendAndIncomeStructure { title: String, value: Number, id: String, createdData: Number }
+type walletIncomeStructure = { title:string, value:number, _id:string }
 interface incomeCardProps {
-  incomeData: spendAndIncomeStructure
-  deleteIncomeCard: Function
-  updateIncomeCard: Function
+  incomeData: walletIncomeStructure
 }
 
 const IncomeCardContainer = styled(Card)<CardProps>({ 
@@ -24,7 +23,9 @@ const IncomeCardContainer = styled(Card)<CardProps>({
 
 
 const IncomeCard = (props: incomeCardProps) => {
-  const { incomeData, deleteIncomeCard, updateIncomeCard } = props
+  const { incomeData } = props
+  const [deleteWalletMutation]  = useDeleteWalletIncomeMutation()
+  const [updateWalletMutation]  = useUpdateWalletIncomeMutation()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
   const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
@@ -32,14 +33,14 @@ const IncomeCard = (props: incomeCardProps) => {
   const [editMode, setEditMode] = useState(false)
 
   const deleteButtonHandler = () => {
-    deleteIncomeCard(incomeData.id)
+    deleteWalletMutation(incomeData._id)
     menuHandleClose()
   }
 
   const editButtonHandler = () => setEditMode(true)
 
-  const updateButtonHandler = (updatedData: spendAndIncomeStructure) => {
-    updateIncomeCard(updatedData)
+  const updateButtonHandler = (updatedData: walletIncomeStructure) => {
+    updateWalletMutation({id: updatedData._id, body: updatedData})
     menuHandleClose()
     setEditMode(false)
   }

@@ -3,20 +3,22 @@ import { Doughnut } from 'react-chartjs-2';
 import { Accordion, AccordionSummary, Box, Container, Typography, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import WalletStatusCard from '../Components/Wallet/WalletStatusCard';
+import { useFetchWalletIncomeQuery } from '../Slices/wallet-income-slice/walletIncomeSlice';
+import { useFetchWalletSpendQuery } from '../Slices/wallet-spend-slice/walletSpendSlice';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 
 const WalletStatus = () => {
-    const currentStorage: any = localStorage.getItem("dashboard")
-    const currentStorageJSON = JSON.parse(currentStorage);
-    const incomeList: any[] = currentStorageJSON.wallet.income.map((item: any) => {return {...item,category: "income"}})
-    const spendList: any[] = currentStorageJSON.wallet.spend.map((item: any) => {return {...item,category: "spend"}})
-    const cardSpendAll = incomeList.concat(spendList)
-    const allIncomeValue = incomeList.reduce((totalValue: Number, incomeValue: any) => {return totalValue + incomeValue.value}, 0)
-    const allspendValue = spendList.reduce((totalValue: Number, spendValue: any) => {return totalValue + spendValue.value}, 0)
-    const sortedCardTimeLine = cardSpendAll.sort((a: any, b: any) => {
-      if (a.createdData > b.createdData) {
+  const walletIncome = useFetchWalletIncomeQuery()
+  const walletSpend = useFetchWalletSpendQuery()
+    const incomeList = walletIncome?.data?.map((item:any) => {return {...item, category: "income"}})
+    const spendList = walletSpend?.data?.map((item:any) => {return {...item, category: "spend"}})
+    const cardSpendAll = incomeList?.concat(spendList)
+    const allIncomeValue = incomeList?.reduce((totalValue: Number, incomeValue: any) => {return totalValue + incomeValue.value}, 0)
+    const allspendValue = spendList?.reduce((totalValue: Number, spendValue: any) => {return totalValue + spendValue.value}, 0)
+    const sortedCardTimeLine = cardSpendAll?.sort((a: any, b: any) => {
+      if (a.createdAt > b.createdAt) {
         return 1
       }else {
         return -1
@@ -48,7 +50,7 @@ const WalletStatus = () => {
             <Doughnut data={data} />
         </Box>
         <Box sx={{ marginTop: '3rem' }}>
-            <Accordion>
+          <Accordion>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -57,9 +59,11 @@ const WalletStatus = () => {
               <Typography>Icome & Spend TimeLine</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {sortedCardTimeLine.map((item, index) => (
-                <WalletStatusCard cardData={item} key={index} />
-              ))}
+              {walletIncome.isSuccess && walletSpend.isSuccess ? (
+                sortedCardTimeLine?.map((item, index) => (
+                  <WalletStatusCard cardData={item} key={index} />
+                ))
+              ) : null}
             </AccordionDetails>
           </Accordion>
         </Box>

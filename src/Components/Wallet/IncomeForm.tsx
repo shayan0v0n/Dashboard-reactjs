@@ -1,11 +1,9 @@
 import { Grid, TextField, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
-interface incomeProps {
-    setIncomeList: Function
-}
+import { useAddWalletIncomeMutation } from '../../Slices/wallet-income-slice/walletIncomeSlice'
 
-const IncomeForm = (props: incomeProps) => {
-    const { setIncomeList } = props
+const IncomeForm = () => {
+    const [addWalletIncome] = useAddWalletIncomeMutation()
     const [ title, setTitle ] = useState('')
     const [ value, setValue ] = useState('')
     const [formValidate, setFormValidate] = useState(false)
@@ -18,7 +16,7 @@ const IncomeForm = (props: incomeProps) => {
     }, [title, value])
 
     const setIncome = () => {
-        setIncomeList({ title: title, value: Number(value) })
+        addWalletIncome({ title: title, value: Number(value) })
         setTitle('')
         setValue('')
     }

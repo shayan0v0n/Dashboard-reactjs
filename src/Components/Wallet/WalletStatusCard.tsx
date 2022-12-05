@@ -1,30 +1,25 @@
 import { Card, Typography, Box, Tooltip, Button } from '@mui/material'
 import { styled, CardProps } from "@mui/material";
-import Menu from '@mui/material/Menu'
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import MenuItem from '@mui/material/MenuItem';
-import React, { useState } from 'react';
-import EditSpendCard from './EditSpendCard';
 
 
 const WalletStatusCard = (props: any) => {
     const { cardData } = props
-    const SpendCardContainer = styled(Card)<CardProps>({ 
+    const CardContainer = styled(Card)<CardProps>({ 
         margin: '1rem',
         padding: '.8rem', 
         display: "flex", 
         justifyContent: 'space-between', 
         color: 'white', 
-        border: cardData.category == 'income' ? '3px solid #4b6043'  : '3px solid #c30010',
-        background: cardData.category == 'spend' ? '#ee6b6e' : '#b3cf99'
+        border: cardData.category == 'income' ? '0.2px solid #4b6043'  : '0.2px solid #c30010',
+        boxShadow: cardData.category == 'spend' ? '0px 0px 10px #ee6b6e' : '0px 0px 10px #b3cf99'
     })
   return (
-    <SpendCardContainer>
-        <Tooltip title={`${cardData.category}`} followCursor>
+    <CardContainer>
+        <Tooltip title={`Set ${cardData.category} At : ${cardData.createdAt} & Last Update At: ${cardData.updatedAt}`} followCursor>
             <Typography sx={{fontWeight: 'bold', flexGrow: 1, textAlign: "left", display: 'flex', alignItems: 'center'}}>{cardData.title}</Typography>
         </Tooltip>
             <Typography>${cardData.value}</Typography>
-    </SpendCardContainer>
+    </CardContainer>
   )
 }
 

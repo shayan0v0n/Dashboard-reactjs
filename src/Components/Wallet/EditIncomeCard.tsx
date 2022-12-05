@@ -1,9 +1,9 @@
 import { Grid, TextField, Button, Card } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { styled, CardProps } from "@mui/material";
-interface spendAndIncomeStructure { title: String, value: Number, id: String, createdData: Number }
+type walletIncomeStructure = { title:string, value:number, _id:string }
 interface editIncomeCardProps {
-    currentIncomeData: spendAndIncomeStructure
+    currentIncomeData: walletIncomeStructure
     updateButtonHandler: Function
 }
 
