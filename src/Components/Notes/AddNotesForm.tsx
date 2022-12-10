@@ -1,13 +1,10 @@
 import { Box, TextField, Grid, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import uuid from 'react-uuid'
-interface addNoteProps {
-    addNoteItem: Function
-}
+import { useAddNoteListMutation } from '../../Slices/note-slice/noteSlice'
 
-
-const AddNotesForm = (props: addNoteProps) => {
-    const {addNoteItem} = props
+const AddNotesForm = () => {
+    const [addNoteList] = useAddNoteListMutation()
     const [ title, setTitle ] = useState('')
     const [text, setText] = useState('')
     const [shortDesk, setShortDesc] = useState('')
@@ -27,10 +24,9 @@ const AddNotesForm = (props: addNoteProps) => {
             title: title,
             shortDesc: shortDesk, 
             text: text,
-            id: uuid()
         }
 
-        addNoteItem(noteStructuredItem)
+        addNoteList(noteStructuredItem)
         setTitle('')
         setText('')
         setShortDesc('')

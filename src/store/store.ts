@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { noteListApiSlice } from "../Slices/note-slice/noteSlice";
 import { passwordSaverSlice } from "../Slices/password-saver-slice/passwordSaverSlice";
 import {activeApiSlice} from "../Slices/todo-active-slice/todoActiveSlice";
 import { doneApiSlice } from "../Slices/todo-done-slice/todoDoneSlice";
@@ -13,7 +14,8 @@ export const store = configureStore({
         [urlApiSlice.reducerPath]: urlApiSlice.reducer,
         [passwordSaverSlice.reducerPath]: passwordSaverSlice.reducer,
         [walletIncomeApiSlice.reducerPath]: walletIncomeApiSlice.reducer,
-        [walletSpendApiSlice.reducerPath]: walletSpendApiSlice.reducer
+        [walletSpendApiSlice.reducerPath]: walletSpendApiSlice.reducer,
+        [noteListApiSlice.reducerPath]: noteListApiSlice.reducer
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -23,6 +25,7 @@ export const store = configureStore({
                             .concat(passwordSaverSlice.middleware)
                                 .concat(walletIncomeApiSlice.middleware)
                                     .concat(walletSpendApiSlice.middleware)
+                                        .concat(noteListApiSlice.middleware)
     }
 })
 

@@ -6,21 +6,30 @@ import Accordion from '@mui/material/Accordion';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Button, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-type noteStructure = { title: string, shortDesc: string, text: string, id: string }
+import { useDeleteNoteListMutation } from '../../Slices/note-slice/noteSlice';
+interface noteListInterface {
+    "_id": string
+    "title": string
+    "shortDesc": string
+    "text": string
+    "createdAt": string
+    "updatedAt": string
+    "__v": number
+}
 interface noteCardProps {
-    note: noteStructure
-    deleteNoteItem: Function
+    note: noteListInterface
 }
 
 const NoteCard = (props: noteCardProps) => {
-    const {note, deleteNoteItem} = props
+    const [deleteNote] = useDeleteNoteListMutation()
+    const {note} = props
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [activeListEditMode, setActiveListEditMode] = useState(false)
     const openMenu = Boolean(anchorEl);
   
-    const activeListEditHandler = (newTodo: string) => {setActiveListEditMode(false)}
     const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
     const menuHandleClose = () => {setAnchorEl(null)}
+
   return (
     <>
     <Accordion>
@@ -56,7 +65,7 @@ const NoteCard = (props: noteCardProps) => {
                     }}
             >
             <MenuItem onClick={() => {}}>Edit</MenuItem>
-            <MenuItem onClick={() => deleteNoteItem(note.id)}>Delete</MenuItem>
+            <MenuItem onClick={() => deleteNote(note._id)}>Delete</MenuItem>
           </Menu>
     </Accordion>
     </>
