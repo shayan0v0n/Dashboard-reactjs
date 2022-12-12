@@ -9,6 +9,8 @@ import useDarkMode from './store/useDarkMode';
 import { createTheme, PaletteMode, ThemeProvider } from "@mui/material"
 import { amber, deepOrange, grey } from "@mui/material/colors"
 import Notes from "./Containers/Notes"
+import Search from "./Containers/Search"
+import Setting from "./Containers/Setting"
 
 
 const App = () => {
@@ -37,6 +39,8 @@ const App = () => {
         <Route path="/urlSaver" element={<UrlControl />} />
         <Route path="/passwordSaver" element={<PasswordSaver />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/setting" element={<Setting />} />
       </Routes>
     </Templates>
     </ThemeProvider>

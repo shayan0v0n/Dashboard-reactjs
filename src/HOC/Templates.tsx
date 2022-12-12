@@ -26,8 +26,11 @@ import { Link } from 'react-router-dom';
 import RegisterPassword from '../Components/PasswordAuth/RegisterPassword';
 import { FormControlLabel, Switch } from '@mui/material';
 import DescriptionIcon from '@mui/icons-material/Description';
+import SearchIcon from '@mui/icons-material/Search';
+import SettingsIcon from '@mui/icons-material/Settings';
 import useDarkMode from '../store/useDarkMode';
 import useLoading from '../store/useLoading';
+import Search from '@mui/icons-material/Search';
 
 const dashboardDefault: {
   passwordAuth: any
@@ -122,6 +125,12 @@ const appBarNavigate = [{
 }, {
     title: 'Notes',
     path: '/notes'
+}, {
+  title: 'Search',
+  path: '/search'
+}, {
+  title: 'Setting',
+  path: '/setting'
 }]
 
 
@@ -281,6 +290,8 @@ const Templates = (props: TemplateProps): JSX.Element => {
                   {item.title === 'Url Saver' ? <LinkIcon /> : null}
                   {item.title === 'Password Saver' ? <LockIcon /> : null}
                   {item.title === 'Notes' ? <DescriptionIcon /> : null}
+                  {item.title === 'Search' ? <Search /> : null}
+                  {item.title === 'Setting' ? <SettingsIcon /> : null}
                 </ListItemIcon>
                     <ListItemText primary={item.title} sx={{ opacity: open ? 1 : 0 }} />
                 </ListItemButton>
