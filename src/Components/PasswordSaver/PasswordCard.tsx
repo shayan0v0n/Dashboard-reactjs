@@ -12,7 +12,7 @@ import EditPasswordForm from "./EditPasswordForm";
 import ShowPasswordForm from "./ShowPasswordForm";
 import { useDeletePasswordMutation, useUpdatePasswordMutation } from "../../Slices/password-saver-slice/passwordSaverSlice";
 import { useUpdateActiveTodoMutation } from "../../Slices/todo-active-slice/todoActiveSlice";
-import { useRemoveUserPasswordMutation } from "../../Slices/users-slice/userPasswordSlice";
+import { useFetchUserPasswordQuery, useRemoveUserPasswordMutation } from "../../Slices/users-slice/userPasswordSlice";
 
 interface currentPassowrdsStructure {_id: string, title: string, password: string} 
 interface passwordCardProps {
@@ -28,9 +28,10 @@ const CardPasswordSaver = styled(Card)<CardProps>({
   border: '0.2px solid #1565c0'
 })
 
-const PasswordCard = (props: passwordCardProps) => {
+const PasswordCard = (props: passwordCardProps) => {  
     const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
     const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+    const passwordSaverList = useFetchUserPasswordQuery(currentLocalStorageJSON._id)
     const [deletePassword] = useDeletePasswordMutation()
     const [deleteUserPassword] = useRemoveUserPasswordMutation()
     const [updatePassword] = useUpdatePasswordMutation()
@@ -44,14 +45,15 @@ const PasswordCard = (props: passwordCardProps) => {
     const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
     const menuHandleClose = () => {setAnchorEl(null)}
 
-    const editPasswordHandler = (newPass: currentPassowrdsStructure) => {
+    const editPasswordHandler = async (newPass: currentPassowrdsStructure) => {
       const newPassBody: {title:string, password:string} = {
         title: newPass.title,
         password: newPass.password
       }      
       const query:{id:string, body:{title:string, password:string}} = {id:newPass._id, body:newPassBody}
       
-      updatePassword(query)
+      await updatePassword(query)
+      passwordSaverList.refetch()
       setEditMode(false)
     }
     

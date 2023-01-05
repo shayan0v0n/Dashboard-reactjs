@@ -25,12 +25,14 @@ export const Todos = () => {
     !activeList.isSuccess && !doneList.isSuccess ? toggleModeOn() : toggleModeOff()
   }, [activeList, doneList])
 
-  const activeListEditHandler = (currentTodo: todoStructureProps, newTodo: string) => {
-    updateActiveList({id:currentTodo._id, body:{title: newTodo}})
+  const activeListEditHandler = async (currentTodo: todoStructureProps, newTodo: string) => {
+    await updateActiveList({id:currentTodo._id, body:{title: newTodo}})
+    activeList.refetch()
   }
 
-  const doneListEditHandler = (currentTodo: todoStructureProps, newTodo: string) => {
-    updateDoneList({id:currentTodo._id, body:{title: newTodo}})
+  const doneListEditHandler = async (currentTodo: todoStructureProps, newTodo: string) => {
+    await updateDoneList({id:currentTodo._id, body:{title: newTodo}})
+    doneList.refetch()
   }
 
   const container = {

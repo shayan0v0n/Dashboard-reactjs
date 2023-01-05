@@ -5,7 +5,7 @@ import CopyAllIcon from '@mui/icons-material/CopyAll';
 import EditUrlForm from './EditUrlForm';
 import { styled, CardProps } from "@mui/material";
 import { useDeleteUrlListMutation, useUpdateUrlListMutation } from '../../Slices/urls-slice/urlsSplice';
-import { useRemoveUserUrlsMutation } from '../../Slices/users-slice/userUrlsSlice';
+import { useFetchUserUrlsQuery, useRemoveUserUrlsMutation } from '../../Slices/users-slice/userUrlsSlice';
 
 interface urlCardProps { currentUrl: urlData}
 
@@ -22,11 +22,13 @@ const CardUrlList = styled(Card)<CardProps>({
 
 
 const UrlCard = (props: urlCardProps) => {
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
+    const urlList = useFetchUserUrlsQuery(currentLocalStorageJSON._id)
     const [deleteUrlList] = useDeleteUrlListMutation()
     const [updateUrlList] = useUpdateUrlListMutation()
     const [deleteUserUrl] = useRemoveUserUrlsMutation()
-    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
-    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
     const {currentUrl} = props
     const currentName = currentUrl.name
     const currentAddress = currentUrl.address
@@ -59,12 +61,13 @@ const UrlCard = (props: urlCardProps) => {
         setOpen(false);
     };
 
-    const editUrlHandler = (currentUrl: urlData, currentName: string, currentAddress: string) => {
+    const editUrlHandler = async (currentUrl: urlData, currentName: string, currentAddress: string) => {
             const createUrl:any = {
             name: currentName,
             address: currentAddress
           }
-          updateUrlList({body:createUrl, id:currentUrl._id})
+          await updateUrlList({body:createUrl, id:currentUrl._id})
+          urlList.refetch()
     }
 
     const editHandler = (updatedName: string, updatedAddress: string) => {

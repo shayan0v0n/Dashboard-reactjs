@@ -1,6 +1,5 @@
 import { Box, TextField, Grid, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
-import uuid from 'react-uuid'
 import { useAddNoteListMutation } from '../../Slices/note-slice/noteSlice'
 import { useAddUserNoteListMutation } from '../../Slices/users-slice/userNoteListSlice'
 

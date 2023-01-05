@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
@@ -26,7 +26,6 @@ const NoteCard = (props: noteCardProps) => {
     const [deleteUserNoteList] = useRemoveUserNoteListMutation()
     const {note} = props
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [activeListEditMode, setActiveListEditMode] = useState(false)
     const openMenu = Boolean(anchorEl);
     const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
     const currentLocalStorageJSON = JSON.parse(currentLocalStorage)

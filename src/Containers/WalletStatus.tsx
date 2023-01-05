@@ -3,15 +3,19 @@ import { Doughnut } from 'react-chartjs-2';
 import { Accordion, AccordionSummary, Box, Container, Typography, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import WalletStatusCard from '../Components/Wallet/WalletStatusCard';
-import { useFetchWalletIncomeQuery } from '../Slices/wallet-income-slice/walletIncomeSlice';
-import { useFetchWalletSpendQuery } from '../Slices/wallet-spend-slice/walletSpendSlice';
+import { useFetchUserIncrementWalletQuery } from '../Slices/users-slice/userIncrementWalletSlice';
+import { useFetchUserSpendWalletQuery } from '../Slices/users-slice/userSpendWalletSlice';
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-
 const WalletStatus = () => {
-  const walletIncome = useFetchWalletIncomeQuery()
-  const walletSpend = useFetchWalletSpendQuery()
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+  const navigate = useNavigate()
+
+  const walletIncome = useFetchUserIncrementWalletQuery(currentLocalStorageJSON._id)
+  const walletSpend = useFetchUserSpendWalletQuery(currentLocalStorageJSON._id)
     const incomeList = walletIncome?.data?.map((item:any) => {return {...item, category: "income"}})
     const spendList = walletSpend?.data?.map((item:any) => {return {...item, category: "spend"}})
     const cardSpendAll = incomeList?.concat(spendList)
@@ -24,6 +28,10 @@ const WalletStatus = () => {
         return -1
       }
     })
+
+    if (sortedCardTimeLine?.length === 0) {
+      navigate('/walletControl')
+    }    
     
     const data = {
         labels: ["Spend", "Income"],

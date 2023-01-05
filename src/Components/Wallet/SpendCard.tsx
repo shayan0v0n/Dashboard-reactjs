@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import React, { useState } from 'react';
 import EditSpendCard from './EditSpendCard';
 import { useDeleteWalletSpendMutation, useUpdateWalletSpendMutation } from '../../Slices/wallet-spend-slice/walletSpendSlice';
-import { useRemoveSpendWalletMutation } from '../../Slices/users-slice/userSpendWalletSlice';
+import { useFetchUserSpendWalletQuery, useRemoveSpendWalletMutation } from '../../Slices/users-slice/userSpendWalletSlice';
 type incomeAndSpendStructure = { title:string, value:number, _id:string }
 interface spendCardProps {
   spendData: incomeAndSpendStructure
@@ -29,6 +29,7 @@ const SpendCard = (props: spendCardProps) => {
 
   const { spendData } = props
   const [deleteWalletMutation]  = useDeleteWalletSpendMutation()
+  const walletSpend = useFetchUserSpendWalletQuery(currentLocalStorageJSON._id)
   const [deleteUserWalletMutation] = useRemoveSpendWalletMutation()
   const [updateWalletMutation]  = useUpdateWalletSpendMutation()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -53,6 +54,7 @@ const SpendCard = (props: spendCardProps) => {
 
   const updateButtonHandler = (updatedData: incomeAndSpendStructure) => {
     updateWalletMutation({id:updatedData._id , body: updatedData})
+    walletSpend.refetch()
     menuHandleClose()
     setEditMode(false)
   }

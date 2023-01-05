@@ -8,8 +8,6 @@ interface EditUrlFormProps {
 }
 
 const EditUrlForm = (props: EditUrlFormProps) => {
-    const currentStorage: any = localStorage.getItem("dashboard")
-    const currentStorageJSON = JSON.parse(currentStorage);
     const {formUrl, currentAddress, currentName} = props
     const [ urlName, setUrlName ] = useState(currentName);
     const [ urlAddress, setUrlAddress ] = useState(currentAddress);

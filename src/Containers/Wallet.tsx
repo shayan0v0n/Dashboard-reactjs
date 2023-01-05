@@ -1,17 +1,13 @@
 import { Grid, Typography } from '@mui/material'
 import Button from '@mui/material/Button'
-import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from "framer-motion";
 import IncomeCard from '../Components/Wallet/IncomeCard'
 import IncomeForm from '../Components/Wallet/IncomeForm'
 import SpendCard from '../Components/Wallet/SpendCard'
 import SpendForm from '../Components/Wallet/SpendForm'
-import { useFetchWalletIncomeQuery } from '../Slices/wallet-income-slice/walletIncomeSlice';
-import { useFetchWalletSpendQuery } from '../Slices/wallet-spend-slice/walletSpendSlice';
 import { useFetchUserIncrementWalletQuery } from '../Slices/users-slice/userIncrementWalletSlice';
 import { useFetchUserSpendWalletQuery } from '../Slices/users-slice/userSpendWalletSlice';
-type walletIncomeStructure = { title:string, value:number, _id:string }
 
 const Wallet = () => {
   const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
