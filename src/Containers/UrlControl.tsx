@@ -3,15 +3,18 @@ import { useEffect } from 'react';
 import { motion } from "framer-motion";
 import AddUrlForm from '../Components/UrlControl/AddUrlForm'
 import UrlCard from '../Components/UrlControl/UrlCard';
-import { useFetchUrlListQuery } from '../Slices/urls-slice/urlsSplice';
 import useLoading from '../store/useLoading';
+import { useFetchUserUrlsQuery } from '../Slices/users-slice/userUrlsSlice';
 
 const UrlControl = () => {
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
   const {toggleModeOn, toggleModeOff} = useLoading()
-  const urlList = useFetchUrlListQuery()  
+  const urlList = useFetchUserUrlsQuery(currentLocalStorageJSON._id)  
   useEffect(() => {
     !urlList.isSuccess ? toggleModeOn() : toggleModeOff()
   }, [urlList])
+
 
   const container = {
     hidden: { opacity: 1, scale: 0 },

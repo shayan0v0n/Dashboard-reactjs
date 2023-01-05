@@ -8,6 +8,8 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
+import { useAddUserMutation, useFetchUserQuery } from '../../Slices/users-slice/usersSlice';
+import LoginPassword from './LoginPassword';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -21,11 +23,15 @@ const style = {
 };
 
 const RegisterPassword = () => {
+  const usersData = useFetchUserQuery()
+  const [userAdd] = useAddUserMutation()
   const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
   const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
 
   const [open, setOpen] = useState(true);
   const [ email, setEmail ] = useState('');
+  const [loginModal, setLoginModal] = useState(false)
+  const [loginStatus, setLoginStatus] = useState(true)
   const [ password, setPassword ] = useState('');
   const [ confirmPassword, setConfirmPassword ] = useState('');
   const [passwordStatus, setPasswordStatus] = useState(true)
@@ -41,18 +47,36 @@ const RegisterPassword = () => {
     else setFormValidate(false)
 }
 const setPasswordAuthHandler = () => {
-  const passwordStructure: {email: string, password: string} = {
-    email: email,
-    password: password
-  }
+  const findUser = usersData.data?.findIndex((user:any) => {
+    return user.email === email.trim()
+  })
 
-  const updateStorage: any[] = {
-    ...currentLocalStorageJSON,
-    passwordAuth: passwordStructure
-  }
+  if (findUser !== -1) return
 
-  localStorage.setItem('dashboard', JSON.stringify(updateStorage)); 
+  
+  
+  userAdd({email, password}).then((user:any) => {
+    const passwordStructure: {email: string, password: string, _id:string} = {
+      email: email,
+      password: password,
+      _id: user.data._id 
+    }
+    const updateStorage: any[] = {
+      ...currentLocalStorageJSON,
+      passwordAuth: passwordStructure
+    }
+    localStorage.setItem('dashboard', JSON.stringify(updateStorage));
+  })
+  
+
   handleClose()
+
+
+}
+
+const setLoginHandler = () => {
+  setLoginModal(false)
+  setLoginStatus(false)
 }
 
   useEffect(() => {
@@ -61,6 +85,9 @@ const setPasswordAuthHandler = () => {
 
   return (
     <div>
+      {loginModal ? (
+        <LoginPassword setLogin={setLoginHandler} />
+      ) : null}
       <Modal
         keepMounted
         open={open}
@@ -140,6 +167,9 @@ const setPasswordAuthHandler = () => {
                         onClick={() => setPasswordAuthHandler()}
                         sx={{ margin: '.2rem 0', padding: '1rem' }} >Register</Button>
                 </Grid>
+                <Box sx={{textAlign:'center'}}>
+                  <a href="#" onClick={() => {setLoginModal(true);handleClose()}} style={{color: '#1565c0', textDecoration:'none'}}>I Have A Account</a>
+                </Box>
           </Box>
         </Box>
       </Modal>

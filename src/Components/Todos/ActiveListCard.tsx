@@ -6,8 +6,10 @@ import React, { useState } from "react";
 import EditTodoForm from "./EditTodoForm";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled, CardProps } from "@mui/material";
-import { useDeleteActiveTodoMutation, useFetchActiveTodosQuery } from "../../Slices/todo-active-slice/todoActiveSlice";
-import { useAddDoneTodoMutation, useFetchDoneTodosQuery } from "../../Slices/todo-done-slice/todoDoneSlice";
+import { useDeleteActiveTodoMutation } from "../../Slices/todo-active-slice/todoActiveSlice";
+import { useAddDoneTodoMutation } from "../../Slices/todo-done-slice/todoDoneSlice";
+import { useRemoveUserActiveTodoMutation } from "../../Slices/users-slice/userActiveTodoSlice";
+import { useAddUserDoneTodoMutation } from "../../Slices/users-slice/userDoneTodoSlice";
 
 type todoStructureProps = { title: string, _id: string };
 interface activeListProps {
@@ -17,14 +19,17 @@ interface activeListProps {
 
 
 const ActiveListCard = (props: activeListProps): JSX.Element => {
-  const activeList = useFetchActiveTodosQuery() // { data, isFetching }
-  const doneList = useFetchDoneTodosQuery() // { data, isFetching }
-  const [deleteActiveTodo, responseActiveTodo] = useDeleteActiveTodoMutation()
-  const [addDoneTodo, responseDoneTodo] = useAddDoneTodoMutation()
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
+  const [deleteActiveTodo] = useDeleteActiveTodoMutation()
+  const [deleteUserActiveTodo] = useRemoveUserActiveTodoMutation()
+  const [addDoneTodo] = useAddDoneTodoMutation()
+  const[addUserDoneTodo] = useAddUserDoneTodoMutation()
   
   const [currentStatusCard, setCurrentStatusCard] = useState('none');
   const { currentTodo, activeListEdit} = props
-  const [toggleMenu, setToggleMenu] = useState(window.innerWidth <= 600 ? false : true);
+  const [toggleMenu] = useState(window.innerWidth <= 600 ? false : true);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [activeListEditMode, setActiveListEditMode] = useState(false)
   const openMenu = Boolean(anchorEl);
@@ -42,11 +47,25 @@ const ActiveListCard = (props: activeListProps): JSX.Element => {
   const menuHandleClose = () => {setAnchorEl(null)}
 
   const deleteActiveListTodoHandler = (currentTodo: todoStructureProps) => {
-    deleteActiveTodo(currentTodo._id)
+    deleteActiveTodo(currentTodo._id).then(({data}:any) => {
+      const userActiveTodoParams:{userId:string, todoId:string} = {
+        userId:currentLocalStorageJSON._id,
+        todoId:data._id
+      }
+
+      deleteUserActiveTodo(userActiveTodoParams)
+    })
   }
 
   const setDoneList = (currentTodo: todoStructureProps) => {
-    addDoneTodo({title: currentTodo.title})
+    addDoneTodo({title: currentTodo.title}).then(({data}:any) => {
+      const userActiveTodoParams:{userId:string, todoId:string} = {
+        userId:currentLocalStorageJSON._id,
+        todoId:data._id
+      }
+
+      addUserDoneTodo(userActiveTodoParams)
+    })
   }
   
   const setTodoInDoneList = (currentTodo: todoStructureProps) => {

@@ -9,23 +9,17 @@ import SpendCard from '../Components/Wallet/SpendCard'
 import SpendForm from '../Components/Wallet/SpendForm'
 import { useFetchWalletIncomeQuery } from '../Slices/wallet-income-slice/walletIncomeSlice';
 import { useFetchWalletSpendQuery } from '../Slices/wallet-spend-slice/walletSpendSlice';
+import { useFetchUserIncrementWalletQuery } from '../Slices/users-slice/userIncrementWalletSlice';
+import { useFetchUserSpendWalletQuery } from '../Slices/users-slice/userSpendWalletSlice';
 type walletIncomeStructure = { title:string, value:number, _id:string }
 
 const Wallet = () => {
-  const walletIncome = useFetchWalletIncomeQuery()
-  const walletSpend = useFetchWalletSpendQuery()
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
 
+  const walletIncome = useFetchUserIncrementWalletQuery(currentLocalStorageJSON._id)
+  const walletSpend = useFetchUserSpendWalletQuery(currentLocalStorageJSON._id)
   const navigate = useNavigate()
-  const currentStorage: any = localStorage.getItem("dashboard")
-  const currentStorageJSON = JSON.parse(currentStorage);
-  const [incomeList,]: any[] = useState(currentStorageJSON.wallet.income)
-  const [spendList,]: any[] = useState(currentStorageJSON.wallet.spend)
-  const [walletStatusValidate, setWalletStatusValidate] = useState(false)
-  useEffect(() => {
-    if (spendList.length !== 0 && incomeList.length !== 0) {
-      setWalletStatusValidate(true)
-    }else setWalletStatusValidate(false) 
-  }, [incomeList, spendList])  
 
   const container = {
     hidden: { opacity: 1, scale: 0 },
@@ -49,7 +43,13 @@ const Wallet = () => {
 
   return (
     <>
-     <Button onClick={() => {navigate('/walletControl/walletStatus')}} fullWidth variant='contained' sx={{ padding: '2rem 1rem', margin: '1rem 0' }} disabled={walletStatusValidate ? false : true}>WALLET STATUS</Button>
+      {walletIncome.isSuccess && walletSpend.isSuccess ? (
+        [...walletIncome.data, ...walletSpend.data].length !== 0 ? (
+          <Button onClick={() => {navigate('/walletControl/walletStatus')}} fullWidth variant='contained' sx={{ padding: '2rem 1rem', margin: '1rem 0' }}>WALLET STATUS</Button>
+        ) : (
+          <Button onClick={() => {navigate('/walletControl/walletStatus')}} fullWidth variant='contained' sx={{ padding: '2rem 1rem', margin: '1rem 0' }} disabled>WALLET STATUS</Button>
+        )
+      ) : null}
       <Grid container gap={2} margin="1rem" justifyContent="center">
         <Grid item xs={12} md={5} margin="1rem" textAlign='center'>
           <Typography variant='h5' fontWeight="bold">Income Items💵</Typography>
@@ -60,7 +60,7 @@ const Wallet = () => {
             initial="hidden"
             animate="visible"
             >
-              { walletIncome.data.map((income: walletIncomeStructure) => (
+              { walletIncome.data.map((income: any) => (
                 <motion.div key={income._id} className="item" variants={item}>
                 <IncomeCard key={income._id}
                  incomeData={income} />

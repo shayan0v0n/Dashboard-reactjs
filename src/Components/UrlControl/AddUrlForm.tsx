@@ -1,13 +1,14 @@
 import { Box, Button, Grid, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useAddUrlListMutation } from '../../Slices/urls-slice/urlsSplice'
+import { useAddUserUrlsMutation } from '../../Slices/users-slice/userUrlsSlice'
 type urlStructure = { name:string, address:string }
 
 const AddUrlForm = () => {
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
     const [addUrlList] = useAddUrlListMutation()
-
-    const currentStorage: any = localStorage.getItem("dashboard")
-    const currentStorageJSON = JSON.parse(currentStorage);
+    const [addUserUrl] = useAddUserUrlsMutation()
     const [ urlName, setUrlName ] = useState('');
     const [ urlAddress, setUrlAddress ] = useState('');
     const [formValidate, setFormValidate] = useState(false)
@@ -25,14 +26,20 @@ const AddUrlForm = () => {
         name: urlName,
         address: urlAddress
       }
-      addUrlList(createUrl)
+      addUrlList(createUrl).then(({data}:any) => {
+          const userUrlParams: {
+            userId:string,
+            urlId:string
+          } = {
+              userId: currentLocalStorageJSON._id,
+              urlId:  data._id
+          }
+
+          addUserUrl(userUrlParams)
+      })
     }
     
-    const formControlhandler = () => {
-        const findedIndexAddress = currentStorageJSON.urls.findIndex((item: any) =>item.address == urlAddress)
-        const findedIndexName = currentStorageJSON.urls.findIndex((item: any) =>item.name == urlName)
-        if (findedIndexAddress !== -1 && findedIndexName !== -1) return
-        
+    const formControlhandler = () => {        
         addUrlHandler(urlName, urlAddress)
         setUrlName('')
         setUrlAddress('')

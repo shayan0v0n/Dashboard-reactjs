@@ -4,6 +4,7 @@ import uuid from 'react-uuid'
 import AddNotesForm from '../Components/Notes/AddNotesForm'
 import NoteCard from '../Components/Notes/NoteCard'
 import { useFetchNoteListQuery } from '../Slices/note-slice/noteSlice'
+import { useFetchUserNoteListQuery } from '../Slices/users-slice/userNoteListSlice'
 
 interface noteListInterface {
     "_id": string
@@ -16,9 +17,9 @@ interface noteListInterface {
 }
 
 const Notes = () => {
-    const noteList = useFetchNoteListQuery();
-
-    const currentStorage: any = localStorage.getItem("dashboard")
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+    const noteList = useFetchUserNoteListQuery(currentLocalStorageJSON._id);
 
   return (
     <Container>

@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import React, { useState } from 'react';
 import EditSpendCard from './EditSpendCard';
 import { useDeleteWalletSpendMutation, useUpdateWalletSpendMutation } from '../../Slices/wallet-spend-slice/walletSpendSlice';
+import { useRemoveSpendWalletMutation } from '../../Slices/users-slice/userSpendWalletSlice';
 type incomeAndSpendStructure = { title:string, value:number, _id:string }
 interface spendCardProps {
   spendData: incomeAndSpendStructure
@@ -23,8 +24,12 @@ const SpendCardContainer = styled(Card)<CardProps>({
 
 
 const SpendCard = (props: spendCardProps) => {
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
   const { spendData } = props
   const [deleteWalletMutation]  = useDeleteWalletSpendMutation()
+  const [deleteUserWalletMutation] = useRemoveSpendWalletMutation()
   const [updateWalletMutation]  = useUpdateWalletSpendMutation()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
@@ -33,7 +38,14 @@ const SpendCard = (props: spendCardProps) => {
   const [editMode, setEditMode] = useState(false)
 
   const deleteButtonHandler = () => {
-    deleteWalletMutation(spendData._id)
+    deleteWalletMutation(spendData._id).then(({data}:any) => {
+      const walletSpendParams:{userId:string, spdId:string} = {
+        userId: currentLocalStorageJSON._id,
+        spdId: data._id
+      }
+
+      deleteUserWalletMutation(walletSpendParams)
+    })
     menuHandleClose()
   }
 

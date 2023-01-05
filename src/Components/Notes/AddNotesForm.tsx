@@ -2,13 +2,17 @@ import { Box, TextField, Grid, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import uuid from 'react-uuid'
 import { useAddNoteListMutation } from '../../Slices/note-slice/noteSlice'
+import { useAddUserNoteListMutation } from '../../Slices/users-slice/userNoteListSlice'
 
 const AddNotesForm = () => {
     const [addNoteList] = useAddNoteListMutation()
+    const [addUserNoteList] = useAddUserNoteListMutation()
     const [ title, setTitle ] = useState('')
     const [text, setText] = useState('')
     const [shortDesk, setShortDesc] = useState('')
     const [formValidate, setFormValidate] = useState(false)
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
 
     useEffect(() => {
         checkPassowrdForm()
@@ -26,7 +30,17 @@ const AddNotesForm = () => {
             text: text,
         }
 
-        addNoteList(noteStructuredItem)
+        addNoteList(noteStructuredItem).then((note:any) => {
+            const userNoteListParams: {
+                userId:string,
+                noteId:string
+            } = {
+                userId: currentLocalStorageJSON._id,
+                noteId:  note.data._id
+            }
+            
+            addUserNoteList(userNoteListParams)
+        })
         setTitle('')
         setText('')
         setShortDesc('')

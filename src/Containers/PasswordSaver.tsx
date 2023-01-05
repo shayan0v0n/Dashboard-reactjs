@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import LoginPassword from '../Components/PasswordAuth/LoginPassword';
 import PasswordCard from '../Components/PasswordSaver/PasswordCard';
 import AddPasswordForm from '../Components/PasswordSaver/AddPasswordForm';
-import { useFetchPasswordsQuery } from '../Slices/password-saver-slice/passwordSaverSlice';
 import useLoading from '../store/useLoading';
+import { useFetchUserPasswordQuery } from '../Slices/users-slice/userPasswordSlice';
 interface currentPassowrdsStructure {_id: string, title: string, password: string}
 
 const PasswordSaver = () => {
-  const passwordSaverList = useFetchPasswordsQuery()
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+  const passwordSaverList = useFetchUserPasswordQuery(currentLocalStorageJSON._id)
   const [loginModal, setLoginModal] = useState(true)
   const [loginStatus, setLoginStatus] = useState(true)
   const {toggleModeOn, toggleModeOff} = useLoading()
@@ -65,7 +67,7 @@ const PasswordSaver = () => {
             </motion.div>
             ))}
         </motion.div>
-        ) : <p>Loading...</p>}
+        ) : null}
       <AddPasswordForm 
        login={loginStatus} /> 
      </Box>

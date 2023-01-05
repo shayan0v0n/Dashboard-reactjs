@@ -8,6 +8,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled, CardProps } from "@mui/material";
 import { useFetchDoneTodosQuery, useDeleteDoneTodoMutation } from '../../Slices/todo-done-slice/todoDoneSlice';
 import { useAddActiveTodoMutation } from '../../Slices/todo-active-slice/todoActiveSlice';
+import { useRemoveUserDoneTodoMutation } from '../../Slices/users-slice/userDoneTodoSlice';
+import { useAddUserActiveTodoMutation } from '../../Slices/users-slice/userActiveTodoSlice';
 
 type todoStructureProps = { title: string, _id: string };
 interface DoneListProps {
@@ -16,8 +18,14 @@ interface DoneListProps {
 }
 
 const DoneListCard = (props: DoneListProps): JSX.Element => {
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
   const [deleteDoneTodo] = useDeleteDoneTodoMutation()
+  const [userDeleteDoneTodo] = useRemoveUserDoneTodoMutation()
   const [addActiveList] = useAddActiveTodoMutation()
+  const [userAddActiveList] = useAddUserActiveTodoMutation()
+
   const {currentTodo, doneListEdit} = props
   const [doneListEditMode, setDoneListEditMode] = useState(false)
   const [toggleMenu] = useState(window.innerWidth <= 600 ? false : true);
@@ -39,11 +47,25 @@ const DoneListCard = (props: DoneListProps): JSX.Element => {
     const menuHandleClose = () => {setAnchorEl(null)}
 
     const deleteDoneListHandler = (currentTodo: todoStructureProps) => {
-      deleteDoneTodo(currentTodo._id)
+      deleteDoneTodo(currentTodo._id).then(({data}:any) => {
+        const userActiveTodoParams:{userId:string, todoId:string} = {
+          userId:currentLocalStorageJSON._id,
+          todoId:data._id
+        }
+        
+        userDeleteDoneTodo(userActiveTodoParams)
+      })
     }
-
+    
     const setDoneList = (currentTodo: todoStructureProps) => {
-      addActiveList({title: currentTodo.title})
+      addActiveList({title: currentTodo.title}).then(({data}:any) => {
+        const userActiveTodoParams:{userId:string, todoId:string} = {
+          userId:currentLocalStorageJSON._id,
+          todoId:data._id
+        }
+        
+        userAddActiveList(userActiveTodoParams)
+      })
     }
 
     const returnDoneListHandler = (currentTodo: todoStructureProps) => {

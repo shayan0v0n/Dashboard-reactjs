@@ -12,6 +12,7 @@ import EditPasswordForm from "./EditPasswordForm";
 import ShowPasswordForm from "./ShowPasswordForm";
 import { useDeletePasswordMutation, useUpdatePasswordMutation } from "../../Slices/password-saver-slice/passwordSaverSlice";
 import { useUpdateActiveTodoMutation } from "../../Slices/todo-active-slice/todoActiveSlice";
+import { useRemoveUserPasswordMutation } from "../../Slices/users-slice/userPasswordSlice";
 
 interface currentPassowrdsStructure {_id: string, title: string, password: string} 
 interface passwordCardProps {
@@ -28,7 +29,10 @@ const CardPasswordSaver = styled(Card)<CardProps>({
 })
 
 const PasswordCard = (props: passwordCardProps) => {
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
     const [deletePassword] = useDeletePasswordMutation()
+    const [deleteUserPassword] = useRemoveUserPasswordMutation()
     const [updatePassword] = useUpdatePasswordMutation()
     const {currentPassword, login} = props
     const [toggleMenu] = useState(window.innerWidth <= 600 ? false : true);
@@ -52,7 +56,14 @@ const PasswordCard = (props: passwordCardProps) => {
     }
     
     const deletePasswordHandler = () => {
-      deletePassword(currentPassword._id)
+      deletePassword(currentPassword._id).then(({data}:any) => {
+        const passwordParams:{userId:string, passId:string} = {
+          userId: currentLocalStorageJSON._id,
+          passId: data._id
+        }
+
+        deleteUserPassword(passwordParams)
+      })
       setEditMode(false)
     }
 

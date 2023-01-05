@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material'
 import { Container } from '@mui/system'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import ActiveListCard from '../Components/Todos/ActiveListCard';
 import { motion } from "framer-motion";
 import AddTodoForm from '../Components/Todos/AddTodoForm';
@@ -8,11 +8,15 @@ import DoneListCard from '../Components/Todos/DoneListCard';
 import { useFetchActiveTodosQuery, useUpdateActiveTodoMutation } from '../Slices/todo-active-slice/todoActiveSlice';
 import { useFetchDoneTodosQuery, useUpdateDoneTodoMutation } from '../Slices/todo-done-slice/todoDoneSlice';
 import useLoading from '../store/useLoading';
+import { useFetchUserActiveTodoQuery } from '../Slices/users-slice/userActiveTodoSlice';
+import { useFetchUserDoneTodosQuery } from '../Slices/users-slice/userDoneTodoSlice';
 type todoStructureProps = { title: string, _id: string };
 
 export const Todos = () => {
-  const activeList = useFetchActiveTodosQuery() // { data, isFetching }
-  const doneList = useFetchDoneTodosQuery(); // { data, isFetching }
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+  const activeList = useFetchUserActiveTodoQuery(currentLocalStorageJSON._id) // { data, isFetching }
+  const doneList = useFetchUserDoneTodosQuery(currentLocalStorageJSON._id); // { data, isFetching }
   const {toggleModeOn, toggleModeOff} = useLoading()
   const [updateActiveList] = useUpdateActiveTodoMutation()
   const [updateDoneList] = useUpdateDoneTodoMutation()

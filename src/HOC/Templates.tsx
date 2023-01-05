@@ -34,30 +34,8 @@ import Search from '@mui/icons-material/Search';
 
 const dashboardDefault: {
   passwordAuth: any
-  todos: {
-    activeList: any[]
-    doneList: any[]
-  }
-  urls: any[]
-  passwords: any[]
-  wallet: {
-    income: any[]
-    spend: any[]
-  },
-  notes: any[]
 } = {
-  passwordAuth: {},
-  todos: {
-    activeList: [],
-    doneList: []
-  },
-  urls: [],
-  passwords: [],
-  wallet: {
-    income: [],
-    spend: []
-  },
-  notes: []
+  passwordAuth: {}
 }
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
@@ -271,6 +249,7 @@ const Templates = (props: TemplateProps): JSX.Element => {
           {appBarNavigate.map((item, index) => (
             <Link to={`${item.path}`} style={{ textDecoration: 'none', color: 'inherit' }} key={index}>
             <ListItem disablePadding sx={{ display: 'block' , background: currentPath === item.path ? '#cfcccc' : null }} onClick={() => changeNavigate(item.path)}>
+              {index == 6 ? (<Divider />) : null}
               <ListItemButton
                 sx={{
                   minHeight: 48,

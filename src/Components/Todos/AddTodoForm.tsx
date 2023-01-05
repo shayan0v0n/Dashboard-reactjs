@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Button, Grid, TextField } from '@mui/material'
 import { useAddActiveTodoMutation, useFetchActiveTodosQuery } from '../../Slices/todo-active-slice/todoActiveSlice'
+import { useAddUserActiveTodoMutation } from '../../Slices/users-slice/userActiveTodoSlice'
 interface addTodoFormProps {
     currentName?: string
 }
 
 const AddTodoForm = (props: addTodoFormProps) => {
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
   const [addActiveTodo] = useAddActiveTodoMutation()
+  const [addUserActiveTodo] = useAddUserActiveTodoMutation()
   const [ addTodo, setAddTodo ] = useState(props.currentName ? props.currentName : '');
   const [formValidate, setFormValidate] = useState(false)
 
@@ -18,7 +23,14 @@ const AddTodoForm = (props: addTodoFormProps) => {
     const createActiveTodo: {title:string} = {
       title: currentTodo
     }
-    addActiveTodo(createActiveTodo)
+    addActiveTodo(createActiveTodo).then(({data}:any) => {
+      const userActiveTodoParams:{userId:string, todoId:string} = {
+        userId:currentLocalStorageJSON._id,
+        todoId:data._id
+      }
+
+      addUserActiveTodo(userActiveTodoParams)
+    })
     setAddTodo('')
   }
 

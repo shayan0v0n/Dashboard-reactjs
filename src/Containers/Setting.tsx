@@ -1,8 +1,8 @@
-import React from 'react'
+import { Typography } from '@mui/material'
 
 const Setting = () => {
   return (
-    <div>Setting</div>
+    <Typography variant='h4' sx={{textAlign:'center', margin:'7rem 0', fontWeight:'bold'}}>Coming Soon...</Typography>
   )
 }
 

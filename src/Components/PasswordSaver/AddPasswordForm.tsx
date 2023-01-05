@@ -4,13 +4,17 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useEffect, useState } from 'react'
 import uuid from 'react-uuid'
 import { useAddPasswordMutation } from '../../Slices/password-saver-slice/passwordSaverSlice';
+import { useAddUserPasswordMutation } from '../../Slices/users-slice/userPasswordSlice';
 interface currentPassowrdsStructure {title: string, password: string}
 interface AddPasswordFormProps {
    login: boolean
-  }
+}
 
 const AddPasswordForm = (props: AddPasswordFormProps) => {
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
   const [addPassword] = useAddPasswordMutation()
+  const [addUserPassword] = useAddUserPasswordMutation();
   const { login } = props
     const [title, setTitle] = useState('')
     const [password, setPassword] = useState('')
@@ -28,7 +32,14 @@ const AddPasswordForm = (props: AddPasswordFormProps) => {
 
     const addPassowrdFormHandler = () => {
       const addPasswordStructure: currentPassowrdsStructure = {title: title, password: password}
-      addPassword(addPasswordStructure)
+      addPassword(addPasswordStructure).then(({data}:any) => {
+        const passwordParams:{userId:string, passId:string} = {
+          userId: currentLocalStorageJSON._id,
+          passId: data._id
+        }
+
+        addUserPassword(passwordParams)
+      })
       setTitle('')
       setPassword('')
     }

@@ -7,6 +7,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Button, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useDeleteNoteListMutation } from '../../Slices/note-slice/noteSlice';
+import { useRemoveUserNoteListMutation } from '../../Slices/users-slice/userNoteListSlice'
 interface noteListInterface {
     "_id": string
     "title": string
@@ -22,13 +23,31 @@ interface noteCardProps {
 
 const NoteCard = (props: noteCardProps) => {
     const [deleteNote] = useDeleteNoteListMutation()
+    const [deleteUserNoteList] = useRemoveUserNoteListMutation()
     const {note} = props
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [activeListEditMode, setActiveListEditMode] = useState(false)
     const openMenu = Boolean(anchorEl);
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
   
     const menuHandleClick = (event: React.MouseEvent<HTMLButtonElement>) => {setAnchorEl(event.currentTarget)}
     const menuHandleClose = () => {setAnchorEl(null)}
+
+    const deleteNoteHandler = (noteId:string) => {
+        deleteNote(noteId).then((note:any) => {
+            const userNoteListParams: {
+                userId:string,
+                noteId:string
+            } = {
+                userId: currentLocalStorageJSON._id,
+                noteId:  note.data._id
+            }
+            
+            deleteUserNoteList(userNoteListParams)
+        })
+    }
 
   return (
     <>
@@ -65,7 +84,7 @@ const NoteCard = (props: noteCardProps) => {
                     }}
             >
             <MenuItem onClick={() => {}}>Edit</MenuItem>
-            <MenuItem onClick={() => deleteNote(note._id)}>Delete</MenuItem>
+            <MenuItem onClick={() => deleteNoteHandler(note._id)}>Delete</MenuItem>
           </Menu>
     </Accordion>
     </>

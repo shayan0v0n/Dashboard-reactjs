@@ -1,9 +1,14 @@
 import { Grid, TextField, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useAddWalletIncomeMutation } from '../../Slices/wallet-income-slice/walletIncomeSlice'
+import { useAddIncrementWalletMutation } from '../../Slices/users-slice/userIncrementWalletSlice'
 
 const IncomeForm = () => {
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
     const [addWalletIncome] = useAddWalletIncomeMutation()
+    const [addUserWalletIncome] = useAddIncrementWalletMutation()
     const [ title, setTitle ] = useState('')
     const [ value, setValue ] = useState('')
     const [formValidate, setFormValidate] = useState(false)
@@ -16,7 +21,14 @@ const IncomeForm = () => {
     }, [title, value])
 
     const setIncome = () => {
-        addWalletIncome({ title: title, value: Number(value) })
+        addWalletIncome({ title: title, value: Number(value) }).then(({data}:any) => {
+            const walletIncomeParams:{userId:string, incId:string} = {
+                userId: currentLocalStorageJSON._id,
+                incId: data._id
+            }
+            
+            addUserWalletIncome(walletIncomeParams)
+        })
         setTitle('')
         setValue('')
     }

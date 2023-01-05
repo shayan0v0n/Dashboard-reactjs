@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuItem from '@mui/material/MenuItem';
 import React, { useState } from 'react';
 import EditIncomeCard from './EditIncomeCard';
+import { useRemoveIncrementWalletMutation } from '../../Slices/users-slice/userIncrementWalletSlice';
 type walletIncomeStructure = { title:string, value:number, _id:string }
 interface incomeCardProps {
   incomeData: walletIncomeStructure
@@ -23,8 +24,12 @@ const IncomeCardContainer = styled(Card)<CardProps>({
 
 
 const IncomeCard = (props: incomeCardProps) => {
+  const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+  const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
   const { incomeData } = props
   const [deleteWalletMutation]  = useDeleteWalletIncomeMutation()
+  const [deleteUserWalletMutation] = useRemoveIncrementWalletMutation()
   const [updateWalletMutation]  = useUpdateWalletIncomeMutation()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
@@ -33,7 +38,14 @@ const IncomeCard = (props: incomeCardProps) => {
   const [editMode, setEditMode] = useState(false)
 
   const deleteButtonHandler = () => {
-    deleteWalletMutation(incomeData._id)
+    deleteWalletMutation(incomeData._id).then(({data}:any) => {
+      const walletIncomeParams:{userId:string, incId:string} = {
+        userId: currentLocalStorageJSON._id,
+        incId: data._id
+      }
+
+      deleteUserWalletMutation(walletIncomeParams)
+    })
     menuHandleClose()
   }
 

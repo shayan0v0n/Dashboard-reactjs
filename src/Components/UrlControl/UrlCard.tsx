@@ -5,6 +5,7 @@ import CopyAllIcon from '@mui/icons-material/CopyAll';
 import EditUrlForm from './EditUrlForm';
 import { styled, CardProps } from "@mui/material";
 import { useDeleteUrlListMutation, useUpdateUrlListMutation } from '../../Slices/urls-slice/urlsSplice';
+import { useRemoveUserUrlsMutation } from '../../Slices/users-slice/userUrlsSlice';
 
 interface urlCardProps { currentUrl: urlData}
 
@@ -23,6 +24,9 @@ const CardUrlList = styled(Card)<CardProps>({
 const UrlCard = (props: urlCardProps) => {
     const [deleteUrlList] = useDeleteUrlListMutation()
     const [updateUrlList] = useUpdateUrlListMutation()
+    const [deleteUserUrl] = useRemoveUserUrlsMutation()
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
     const {currentUrl} = props
     const currentName = currentUrl.name
     const currentAddress = currentUrl.address
@@ -37,7 +41,17 @@ const UrlCard = (props: urlCardProps) => {
     const copyToClipboardHandler = () => {navigator.clipboard.writeText(textToCopy); setOpen(true)}
 
     const deleteUrlHandler = (currentUrl: urlData) => {
-        deleteUrlList(currentUrl._id)
+        deleteUrlList(currentUrl._id).then(({data}:any) => {
+            const userNoteListParams: {
+                userId:string,
+                urlId:string
+            } = {
+                userId: currentLocalStorageJSON._id,
+                urlId:  data._id
+            }
+            
+            deleteUserUrl(userNoteListParams)
+        })
     }
     
     const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {

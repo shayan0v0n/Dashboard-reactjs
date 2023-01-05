@@ -10,6 +10,15 @@ interface SearchResInterface {
     searchRes:string
 }
 
+type SearchResult = {
+    displayed_link:string,
+    position: number,
+    title: string,
+    link: string,
+    thumbnail: string,
+    snippet: string
+}
+
 const CardDoneList = styled(Card)<CardProps>({
     margin: '1rem',
     padding: '.8rem',
@@ -56,9 +65,9 @@ const SearchResCards = (props:SearchResInterface) => {
             initial="hidden"
             animate="visible"
             >
-            {searchResult.data.organic_results.map((res:any) => (
-                <motion.div key={res._id} className="item" variants={item}>
-                    <CardDoneList key={res.position}>
+            {searchResult.data.organic_results.map((res:SearchResult) => (
+                <motion.div key={res.displayed_link} className="item" variants={item}>
+                    <CardDoneList>
                         <p className='font-bold'>{res.displayed_link}</p>
                         <Typography onClick={() => window.location.assign(res.link)} variant='h5' sx={{fontWeight:'bold', margin: '.5rem 0', cursor: 'pointer'}}>{res.title}</Typography>
                         <Typography sx={{fontWeight:'bold', margin: '.5rem 0'}}>{res.snippet}</Typography>

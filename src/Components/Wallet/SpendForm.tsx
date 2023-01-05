@@ -1,9 +1,14 @@
 import { Grid, TextField, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useAddWalletSpendMutation } from '../../Slices/wallet-spend-slice/walletSpendSlice'
+import { useAddSpendWalletMutation } from '../../Slices/users-slice/userSpendWalletSlice';
 
 const SpendForm = () => {
+    const currentLocalStorage: any = localStorage.getItem('dashboard') ? localStorage.getItem('dashboard') : null;
+    const currentLocalStorageJSON = JSON.parse(currentLocalStorage)
+
     const [addWalletSpend] = useAddWalletSpendMutation()
+    const [addUserWalletSpend] = useAddSpendWalletMutation()
     const [ title, setTitle ] = useState('')
     const [ value, setValue ] = useState('')
     const [formValidate, setFormValidate] = useState(false)
@@ -16,7 +21,14 @@ const SpendForm = () => {
     }, [title, value])
 
     const setSpend = () => {
-        addWalletSpend({ title: title, value: Number(value) })
+        addWalletSpend({ title: title, value: Number(value) }).then(({data}:any) => {
+            const walletSpendParams:{userId:string, spdId:string} = {
+                userId: currentLocalStorageJSON._id,
+                spdId: data._id
+            }
+
+            addUserWalletSpend(walletSpendParams)
+        })
         setTitle('')
         setValue('')
     }
